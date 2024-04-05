@@ -167,61 +167,15 @@ class MenuScreen(Screen):
 
 class TarotScreen(Screen):
     def __init__(self, **kwargs):
-    #     super(TarotScreen, self).__init__(**kwargs)
-        
-    #     self.connection = api.Connection()
-    #     self.cotd = self.connection.get_cotd_random()
-    #     # Создаем виджет Scatter
-    #    # self.scatter = Scatter(size_hint=(1, 0.33), pos_hint={'center_x': 0.5, 'center_y': 0.5})
-    #   #  self.scatter.do_rotation = False  # Отключаем вращение
-        
-    #     # Создаем макет для размещения других виджетов
-    #     layout = BoxLayout(orientation='vertical')
-        
-    #     # Добавляем метку с заголовком
-    #     layout.add_widget(Label(text='Your card of the day:', font_size=30, size_hint=(1, 0.1)))
-        
-    #     # Создаем изображение карты Таро
-    #     self.tarot_image = Image(source='back_image.png', size_hint=(1, 0.3))
-    #     self.tarot_image.bind(on_touch_down=self.flip_card)
-    #     #self.scatter.add_widget(self.tarot_image)  # Добавляем изображение в Scatter
-        
-    #     # Добавляем ScrollView с текстом
-    #     self.scrollview = ScrollView(
-    #         size_hint=(1, 0.1),
-    #         do_scroll_y=True,
-    #         do_scroll_x=False
-    #     )
-    #     self.textinput = TextInput(text='Нажмите на карту', font_size='20sp', readonly=True, halign='center')
-    #     self.textinput.bind(minimum_height=self.textinput.setter('height'))
-    #     self.textinput.background_color = (0, 0, 0, 0)
-    #     self.textinput.foreground_color = (1, 1, 1, 1)
-    #     self.scrollview.add_widget(self.textinput)
-        
-    #     # Добавляем виджеты в макет
-    #     layout.add_widget(self.tarot_image)
-    #     layout.add_widget(self.scrollview)
-        
-    #     # Добавляем макет на экран
-    #     self.add_widget(layout)
-
         super(TarotScreen, self).__init__(**kwargs)
         self.connection = api.Connection()
         self.cotd = self.connection.get_cotd_random()
-        # self.scatter = Scatter(
-        #     size_hint=(1, 0.33), 
-        #     pos_hint={'center_x': 0.5, 'center_y': 0.5}
-        # )
-
         layout = BoxLayout(orientation='vertical')
-
         layout.add_widget(Label(text='Your card of the day:', font_size=30, size_hint=(1, 0.2)))
 
         self.tarot_image = Image(source='back_image.png')
         self.tarot_image.bind(on_touch_down=self.flip_card)
-        # self.scatter = Scatter()
         layout.add_widget(self.tarot_image)
-        # layout.add_widget(self.scatter)
         
         self.scrollview = ScrollView(
             size_hint=(0.8, 0.4),
@@ -249,14 +203,12 @@ class TarotScreen(Screen):
                 
                 if "Reversed_" in cardname:
                     cardname = cardname.replace("Reversed_", "")
-                  #  self.scatter.rotation = 180
 
                 cardname = cards[cardname]
                 self.tarot_image.source = f'tarot_images/{cardname}.jpg'
                 self.textinput.halign  = 'left'
                 self.textinput.text = self.cotd["your_result"]
             else:
-                # self.scatter.rotation = 0
                 self.tarot_image.source = 'back_image.png'
                 self.textinput.text = 'Нажмите на карту'
                 self.textinput.halign  = 'center'
