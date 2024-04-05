@@ -1,137 +1,275 @@
-import kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
-from kivy.network.urlrequest import UrlRequest
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.image import Image
+import api
+from kivy.uix.textinput import TextInput
 
-kivy.require('2.0.0')
+from kivy.lang import Builder
+from kivy.app import App
+from kivy.clock import Clock
+from kivy.uix.boxlayout import BoxLayout
 
+import random
+from kivy.graphics.transformation import Matrix
+from kivy.uix.scatter import Scatter
 
-class Menu(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        layout = BoxLayout(orientation='vertical')
-        layout.add_widget(Button(text='Card of the day', on_press=self.open_cotd))
-        layout.add_widget(Button(text='Open Green Screen', on_press=self.open_green))
-        layout.add_widget(Button(text='Open Blue Screen', on_press=self.open_blue))
-        layout.add_widget(Button(text='Exit', on_press=self.exit_app))
-        self.add_widget(layout)
-
-    def open_cotd(self, *args):
-        screen_manager.current = 'cotd'
-
-    def open_green(self, *args):
-        screen_manager.current = 'green'
-
-    def open_blue(self, *args):
-        screen_manager.current = 'blue'
-
-    def exit_app(self, *args):
-        App.get_running_app().stop()
-
-
-class Red(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        layout = BoxLayout(orientation='vertical')
-        layout.add_widget(Button(text='Back to Menu', on_press=self.back_to_menu))
-        self.add_widget(layout)
-
-    def back_to_menu(self, *args):
-        screen_manager.current = 'menu'
-
-
-class Green(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        layout = BoxLayout(orientation='vertical')
-        layout.add_widget(Button(text='Back to Menu', on_press=self.back_to_menu))
-        self.add_widget(layout)
-
-    def back_to_menu(self, *args):
-        screen_manager.current = 'menu'
-
-
-class Blue(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        layout = BoxLayout(orientation='vertical')
-        layout.add_widget(Button(text='Back to Menu', on_press=self.back_to_menu))
-        self.add_widget(layout)
-
-    def back_to_menu(self, *args):
-        screen_manager.current = 'menu'
+class MyBox(BoxLayout):
 
 
 
-class COTDScreen(Screen):
-    def on_enter(self):
-        # Событие on_enter вызывается, когда экран становится активным
-        # Создаем контейнер BoxLayout
-        box = BoxLayout(orientation='vertical')
-
-        # Создаем виджет для ввода числа
-        self.numb_input = TextInput(text='', multiline=False)
-
-        # Создаем кнопку
-        btn = Button(text='Отправить запрос', size_hint=(.5, .5), pos_hint={'center_x': .5, 'center_y': .5})
-        btn.bind(on_press=self.on_button_press)
-
-        # Создаем виджет для вывода ответа
-        self.result_label = Label(text='', size_hint_y=None, height=400, text_size=(400, None), valign='top')
-
-        # Создаем прокручиваемую область для виджета Label
-        scroll = ScrollView(size_hint=(1, None), size=(400, 400), pos_hint={'center_x': .5, 'center_y': .5})
-        scroll.add_widget(self.result_label)
-
-        # Создаем кнопку для возврата в меню
-        return_btn = Button(text='Вернуться в меню', size_hint=(.5, .5), pos_hint={'center_x': .5, 'center_y': .5})
-        return_btn.bind(on_press=self.back_to_menu)
-
-        # Добавляем виджеты в контейнер
-        box.add_widget(self.numb_input)
-        box.add_widget(btn)
-        box.add_widget(scroll)
-        box.add_widget(return_btn)
-
-        # Устанавливаем контейнер как корневой элемент экрана
-        self.add_widget(box)
-
-    def on_button_press(self, instance):
-        # Получаем введенное число из виджета
-        numb = self.numb_input.text
-
-        # Формируем URL
-        url = f"http://127.0.0.1:8000/cotd/{numb}"
-
-        # Отправляем запрос на сервер
-        UrlRequest(url=url, on_success=self.handle_success, on_error=self.handle_error)
-
-    def handle_success(self, request, response):
-        # Обновляем текст в виджете для вывода ответа
-        self.result_label.text += response["your_result"] + '\n'
-
-    def handle_error(self, request, error):
-        # Выводим сообщение об ошибке в виджете
-        self.result_label.text += str(error) + '\n'
-    
-    def back_to_menu(self, *args):
-        screen_manager.current = 'menu'
-
-screen_manager = ScreenManager()
-screen_manager.add_widget(Menu(name='menu'))
-screen_manager.add_widget(COTDScreen(name='cotd'))
-screen_manager.add_widget(Green(name='green'))
-screen_manager.add_widget(Blue(name='blue'))
+    def later_(self, dt=None):
+        self.t.apply_transform(Matrix().scale(-1, 1.0, 1.0),
+                             post_multiply=True,
+                             anchor=self.to_local(*self.center))
+        Clock.schedule_once(self.later_, 1.0)
 
 class TestApp(App):
     def build(self):
-        return screen_manager
 
+
+        Builder.load_string("""\
+<MyBox>:
+    t: s
+    orientation: 'vertical'
+    Scatter:
+        id: s
+        do_scale: 0
+        do_rotate: 0
+        do_translation: 0,0 
+        Label:
+
+            pos: s.pos
+            size: s.size
+            text: "The text below will keep changing using a delayed function..."
+
+        """
+        )
+        mybox = MyBox()
+        Clock.schedule_once(mybox.later_, 1.0)
+
+        return mybox
+
+
+cards = {
+  "Fool": "Fool",
+  "Magician": "Magician",
+  "High_Priestess": "High Priestess",
+  "Empress": "Empress",
+  "Emperor": "Emperor",
+  "Hierophant": "Hierophant",
+  "Lovers": "Lovers",
+  "Chariot": "Chariot",
+  "Strength": "Strength",
+  "Hermit": "Hermit",
+  "Wheel_Of_Fortune": "Wheel of Fortune",
+  "Justice": "Justice",
+  "Hanged_Man": "Hanged Man",
+  "Death": "Death",
+  "Temperance": "Temperance",
+  "Devil": "Devil",
+  "Tower": "Tower",
+  "Star": "Star",
+  "Moon": "Moon",
+  "Sun": "Sun",
+  "Judgement": "Judgement",
+  "World": "World",
+  "Ace_Of_Cups": "1",
+  "Two_Of_Cups": "2",
+  "Three_Of_Cups": "3",
+  "Four_Of_Cups": "4",
+  "Five_Of_Cups": "5",
+  "Six_Of_Cups": "6",
+  "Seven_Of_Cups": "7",
+  "Eight_Of_Cups": "8",
+  "Nine_Of_Cups": "9",
+  "Ten_Of_Cups": "10",
+  "Page_Of_Cups": "11",
+  "Knight_Of_Cups": "12",
+  "Queen_Of_Cups": "13",
+  "King_Of_Cups": "14",
+  "Ace_Of_Wands": "15",
+  "Two_Of_Wands": "16",
+  "Three_Of_Wands": "17",
+  "Four_Of_Wands": "18",
+  "Five_Of_Wands": "19",
+  "Six_Of_Wands": "20",
+  "Seven_Of_Wands": "21",
+  "Eight_Of_Wands": "22",
+  "Nine_Of_Wands": "23",
+  "Ten_Of_Wands": "24",
+  "Page_Of_Wands": "25",
+  "Knight_Of_Wands": "26",
+  "Queen_Of_Wands": "27",
+  "King_Of_Wands": "28",
+  "Ace_Of_Swords": "29",
+  "Two_Of_Swords": "30",
+  "Three_Of_Swords": "31",
+  "Four_Of_Swords": "32",
+  "Five_Of_Swords": "33",
+  "Six_Of_Swords": "34",
+  "Seven_Of_Swords": "35",
+  "Eight_Of_Swords": "36",
+  "Nine_Of_Swords": "37",
+  "Ten_Of_Swords": "38",
+  "Page_Of_Swords": "39",
+  "Knight_Of_Swords": "40",
+  "Queen_Of_Swords": "41",
+  "King_Of_Swords": "42",
+  "Ace_Of_Pentacles": "43",
+  "Two_Of_Pentacles": "44",
+  "Three_Of_Pentacles": "45",
+  "Four_Of_Pentacles": "46",
+  "Five_Of_Pentacles": "47",
+  "Six_Of_Pentacles": "48",
+  "Seven_Of_Pentacles": "49",
+  "Eight_Of_Pentacles": "50",
+  "Nine_Of_Pentacles": "51",
+  "Ten_Of_Pentacles": "52",
+  "Page_Of_Pentacles": "53",
+  "Knight_Of_Pentacles": "54",
+  "Queen_Of_Pentacles": "55",
+  "King_Of_Pentacles": "56",
+}
+
+
+class MenuScreen(Screen):
+    def __init__(self, **kwargs):
+        super(MenuScreen, self).__init__(**kwargs)
+        
+        # Создаем макет
+        layout = BoxLayout(orientation='vertical')
+        
+        # Добавляем заголовок
+        layout.add_widget(Label(text='Меню', font_size=30))
+        
+        # Добавляем кнопку "Таро"
+        taro_button = Button(text='Таро', size_hint=(1, 0.5))
+        taro_button.bind(on_press=self.taro_button_pressed)
+        layout.add_widget(taro_button)
+        
+        # Добавляем кнопку "Выход"
+        exit_button = Button(text='Выход', size_hint=(1, 0.5))
+        exit_button.bind(on_press=self.exit_button_pressed)
+        layout.add_widget(exit_button)
+    
+        self.add_widget(layout)
+
+    def taro_button_pressed(self, instance):
+        self.manager.current = 'tarot_screen'
+
+    def exit_button_pressed(self, instance):
+        App.get_running_app().stop()
+
+
+class TarotScreen(Screen):
+    def __init__(self, **kwargs):
+    #     super(TarotScreen, self).__init__(**kwargs)
+        
+    #     self.connection = api.Connection()
+    #     self.cotd = self.connection.get_cotd_random()
+    #     # Создаем виджет Scatter
+    #    # self.scatter = Scatter(size_hint=(1, 0.33), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+    #   #  self.scatter.do_rotation = False  # Отключаем вращение
+        
+    #     # Создаем макет для размещения других виджетов
+    #     layout = BoxLayout(orientation='vertical')
+        
+    #     # Добавляем метку с заголовком
+    #     layout.add_widget(Label(text='Your card of the day:', font_size=30, size_hint=(1, 0.1)))
+        
+    #     # Создаем изображение карты Таро
+    #     self.tarot_image = Image(source='back_image.png', size_hint=(1, 0.3))
+    #     self.tarot_image.bind(on_touch_down=self.flip_card)
+    #     #self.scatter.add_widget(self.tarot_image)  # Добавляем изображение в Scatter
+        
+    #     # Добавляем ScrollView с текстом
+    #     self.scrollview = ScrollView(
+    #         size_hint=(1, 0.1),
+    #         do_scroll_y=True,
+    #         do_scroll_x=False
+    #     )
+    #     self.textinput = TextInput(text='Нажмите на карту', font_size='20sp', readonly=True, halign='center')
+    #     self.textinput.bind(minimum_height=self.textinput.setter('height'))
+    #     self.textinput.background_color = (0, 0, 0, 0)
+    #     self.textinput.foreground_color = (1, 1, 1, 1)
+    #     self.scrollview.add_widget(self.textinput)
+        
+    #     # Добавляем виджеты в макет
+    #     layout.add_widget(self.tarot_image)
+    #     layout.add_widget(self.scrollview)
+        
+    #     # Добавляем макет на экран
+    #     self.add_widget(layout)
+
+        super(TarotScreen, self).__init__(**kwargs)
+        self.connection = api.Connection()
+        self.cotd = self.connection.get_cotd_random()
+        # self.scatter = Scatter(
+        #     size_hint=(1, 0.33), 
+        #     pos_hint={'center_x': 0.5, 'center_y': 0.5}
+        # )
+
+        layout = BoxLayout(orientation='vertical')
+
+        layout.add_widget(Label(text='Your card of the day:', font_size=30, size_hint=(1, 0.2)))
+
+        self.tarot_image = Image(source='back_image.png')
+        self.tarot_image.bind(on_touch_down=self.flip_card)
+        # self.scatter = Scatter()
+        layout.add_widget(self.tarot_image)
+        # layout.add_widget(self.scatter)
+        
+        self.scrollview = ScrollView(
+            size_hint=(0.8, 0.4),
+            do_scroll_y=True,
+            do_scroll_x=False,
+            pos_hint={'center_x': 0.5},
+        )
+        text = ('Нажмите на карту')
+        self.textinput = TextInput(text=text, size_hint_y=None, font_size='20sp', readonly=True, halign = 'center')
+
+        self.textinput.bind(minimum_height=self.textinput.setter('height'))
+        self.textinput.background_color = (0, 0, 0, 0)
+        self.textinput.foreground_color = (1, 1, 1, 1)
+        self.scrollview.add_widget(self.textinput)
+        layout.add_widget(self.scrollview)
+
+        self.add_widget(layout)
+
+    def flip_card(self, instance, touch):
+        if self.tarot_image.collide_point(*touch.pos):
+            if self.tarot_image.source == 'back_image.png':
+                cardname:str = self.cotd["Card"]
+                cardname = cardname.replace(' ', "_")
+                cardname = cardname.replace("The", "")
+                
+                if "Reversed_" in cardname:
+                    cardname = cardname.replace("Reversed_", "")
+                  #  self.scatter.rotation = 180
+
+                cardname = cards[cardname]
+                self.tarot_image.source = f'tarot_images/{cardname}.jpg'
+                self.textinput.halign  = 'left'
+                self.textinput.text = self.cotd["your_result"]
+            else:
+                # self.scatter.rotation = 0
+                self.tarot_image.source = 'back_image.png'
+                self.textinput.text = 'Нажмите на карту'
+                self.textinput.halign  = 'center'
+
+
+class MyApp(App):
+    def build(self):
+        sm = ScreenManager()
+
+        sm.add_widget(MenuScreen(name='menu_screen'))
+        sm.add_widget(TarotScreen(name='tarot_screen'))
+
+        return sm
 
 if __name__ == '__main__':
-    TestApp().run()
+    MyApp().run()
