@@ -1,6 +1,6 @@
 {
     "2024-03-21": {
-        "Card": "Reversed King Of Pentacles",
+        "Card": "The_Reversed_Eight_Of_Wands",
         "your_result": "The Reversed Eight of Wands suggests that you may encounter some delays or obstacles throughout your day. It could also indicate a lack of progress or feeling stuck in certain areas of your life. It's important to remain patient and adaptable, and be open to alternative solutions or pathways. Communication may also be challenging, so be mindful of your interactions with others and try to be as clear and direct as possible. Overall, it may be a day of slow movement and potential frustration, but by staying flexible and maintaining a positive attitude, you can navigate through any challenges that come your way."
     }
 }

@@ -9,29 +9,6 @@ from PIL import Image as PImage
 import io
 from pathlib import Path
 
-
-kv = """
-<MirrorImage>:
-    keep_ratio: True
-    allow_stretch: True
-
-BoxLayout:
-    orientation: 'vertical'
-    Label:
-        size_hint_y: None
-        height: 48
-        text: 'Mirror Image Test'
-    MirrorImage:
-        id: mi
-        source:'back_image.png'  # replace with your image
-    ToggleButton:
-        size_hint_y: None
-        height: 48
-        text: 'Mirror'
-        on_release: mi.mirror = False if self.state == 'normal' else True
-"""
-
-
 class MirrorImage(Image):
     mirror = BooleanProperty(False
 )
@@ -42,7 +19,6 @@ class MirrorImage(Image):
         self.previous_filename = None
         self.extension = {'.jpg': {'format': 'jpeg', 'ext': 'jpg'},
                           '.png': {'format': 'png', 'ext': 'png'}}
-        # expand with required formats, see: https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 
     def on_source(self, *args):
         if not self.source or self.source == self.previous_filename: # if source is '' or same as previous
@@ -62,9 +38,10 @@ class MirrorImage(Image):
         else:
             self.reload()
 
-class MirrorImageApp(App):
-    def build(self):
-        return Builder.load_string(kv)
 
-
-MirrorImageApp().run()
+kv = """
+MirrorImage:
+    id: mi
+    source:'back_image.png'  # replace with your image
+"""
+image:MirrorImage = Builder.load_string(kv)
